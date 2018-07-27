@@ -9,10 +9,12 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-jdk:
-  - oraclejdk8
-  - openjdk8
-  - oraclejdk9
+services:
+- docker
 
-script:
-  - ./gradlew clean build javadoc
+jobs:
+  include:
+  - script: docker run openjdk:8-jdk-slim /bin/sh -c "apt-get update && apt-get install --yes git && git clone --depth 50 --recurse-submodules --branch=$TRAVIS_BRANCH https://github.com/$TRAVIS_REPO_SLUG.git && cd JavaHamcrest && ./gradlew clean build javadoc"
+  - script: docker run openjdk:9-jdk-slim /bin/sh -c "apt-get update && apt-get install --yes git && git clone --depth 50 --recurse-submodules --branch=$TRAVIS_BRANCH https://github.com/$TRAVIS_REPO_SLUG.git && cd JavaHamcrest && ./gradlew clean build javadoc"
+  - script: docker run openjdk:11-jdk-slim /bin/sh -c "apt-get update && apt-get install --yes git && git clone --depth 50 --recurse-submodules --branch=$TRAVIS_BRANCH https://github.com/$TRAVIS_REPO_SLUG.git && cd JavaHamcrest && ./gradlew clean build javadoc"
+    # use Docker in order to avoid delay of release of JDKs and availability in Travis CI
